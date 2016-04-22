@@ -61,12 +61,22 @@ public class Mage : PT_MonoBehaviour {
 	public float elementRotDist = 0.5f; //Radius of rotation
 	public float elementRotSpeed = 0.5f; //Period of rotation
 	public int maxNumSelectedElements = 1;
+	public Color[] elementColors;
 
 	public bool _________________;
+
+	public List<Vector3> linePts; //Poitns to be shown in the line.
+	protected LineRenderer liner; //Ref to the LineRenderer component.
+	protected float lineZ = -0.1f; //Z depth of the line.
+	//Protected variables are between public and private.
+	//Protected variables can be seen by this class or any subclasses.
+	//Only public variables appear in the inspector.
+
 
 
 	public MPhase mPhase = MPhase.idle;
 	public List<MouseInfo> mouseInfos = new List<MouseInfo>();
+	public string actionStartTag; // ["Mage", "Ground", "Enemy"]
 
 	public bool walking = false;
 	public Vector3 walkTarget;
@@ -81,6 +91,10 @@ public class Mage : PT_MonoBehaviour {
 
 		//Find the charactetTrans to rotate with Face()
 		characterTrans = transform.Find ("CharacterTrans");
+
+		//Get the LineRenderer component and disable it.
+		liner = GetComponent<LineRenderer> ();
+		liner.enabled = false;
 	}
 
 	void Update() {
@@ -193,22 +207,54 @@ public MouseInfo lastMouseInfo {
 	//The mouse was pressed on something (it could be a drag or tap)
 		if (DEBUG)
 			print ("Mage.MouseDown()");
+
+		GameObject clickedGO = mouseInfos [0].hitInfo.collider.gameObject;
+		// ^If the mouse wasn't clicked on anything, this would throw
+		// an error because hitINfo would be null, however, we know that MouseDown()
+		// is only called when the mouse WAS clicked on something, so
+		//hitinfo is guaranteed to be defined.
+
+		GameObject taggedParent = Utils.FindTaggedParent (clickedGO);
+		if (taggedParent == null) {
+			actionStartTag = "";
+		} else {
+			actionStartTag = taggedParent.tag;
+			// ^ This should be either "ground", "Mage" or "Enemy"
+		}
 	}
 
 	void MouseTap() {
 	//Something was tapped like a button
 		if(DEBUG) print ("Mage.MouseTap()");
-		WalkTo(lastMouseInfo.loc); //Walk to the latest mouseInfo pos;
-		ShowTap (lastMouseInfo.loc); //Show where the player tapped.
+		//Now this cares what was tapped
+		switch(actionStartTag) {
+		case "Mage":
+			//Do nothing
+			break;
+		case "Ground":
+			//Move to tapped point @ z = 0 whether or not an element is selected
+			WalkTo(lastMouseInfo.loc); //Walk to the first mouseINfopos
+			ShowTap (lastMouseInfo.loc); //Show where the player tapped
+			break;
+		}
 	}
 
 	void MouseDrag() {
 	//The mouse is being drug across something
-		if (DEBUG)
-			print ("Mage.MouseDrag()");
+		if (DEBUG) print ("Mage.MouseDrag()");
 
-		//Continuously walk toward the current mouseInfo pos
-		WalkTo (mouseInfos[mouseInfos.Count-1].loc);
+		//Drag is meaningless unless the mouse started on the ground
+		if(actionStartTag != "Ground") return;
+
+		//If there is no element selected, the player should follow the mouse
+		if (selectedElements.Count == 0) {
+			//Continuously walk toward the current mouseInfo pos
+			WalkTo (mouseInfos [mouseInfos.Count - 1].loc);
+		} else {
+		//This is a ground spell, so we need to draw a line.
+			AddPointToLiner(mouseInfos[mouseInfos.Count-1].loc);
+			// ^ add the most recent MouseInfo.loc to liner.
+		}
 	}
 
 	void MouseDragUp() {
@@ -216,8 +262,20 @@ public MouseInfo lastMouseInfo {
 		if (DEBUG)
 			print ("Mage.MouseDragUp()");
 
-		//Stop walking when the drag is stopped
-		StopWalking ();
+		//Drag is meaningless unless the mouse started on the ground.
+		if (actionStartTag != "Ground")
+			return;
+
+		//If there is no element selected, stop walking now.
+		if (selectedElements.Count == 0) {
+			//Stop walking when the drag is stopped
+			StopWalking ();
+		} else {
+		//ToDO: Cast the spell!!!!
+
+			//Clear the liner
+			ClearLiner();
+		}
 	}
 
 	//Walk to a specific position. The position.z is always 0.
@@ -339,6 +397,39 @@ public MouseInfo lastMouseInfo {
 			vec.z = -0.5f;
 			el.lPos = vec; //Set the position of the Element_Sphere
 		}
+	}
+
+
+	//-----------------LineRenderer Code ---------------------------//
+
+	//Add a new point to the line.
+	void AddPointToLiner(Vector3 pt) {
+		pt.z = lineZ; //Set the z of the pt to lineZ to elevate it slightly
+		//above the ground.
+
+		linePts.Add (pt);
+		UpdateLiner ();
+	}
+
+	//Update the LineRenderer with the new points
+	public void UpdateLiner() {
+	//Get the type of the selectedElement
+		int el =(int) selectedElements[0].type;
+
+		//Set the line color based on that type.
+		liner.SetColors(elementColors[el],elementColors[el]);
+
+		//Update the representation of the ground spell about to be cast.
+		liner.SetVertexCount(linePts.Count); //Set the number of vertices
+		for(int i=0; i<linePts.Count; i++) {
+			liner.SetPosition(i , linePts[i]); //Set each vertex.
+		}
+		liner.enabled = true; //Enable the line renderer.
+	}
+
+	public void ClearLiner() {
+		liner.enabled = false; //Disable linerenderer
+		linePts.Clear (); //And clear all linePts.
 	}
 }
   
