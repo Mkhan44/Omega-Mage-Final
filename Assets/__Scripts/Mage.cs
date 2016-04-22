@@ -63,7 +63,17 @@ public class Mage : PT_MonoBehaviour {
 	public int maxNumSelectedElements = 1;
 	public Color[] elementColors;
 
+	//These set the min and max distance between two line points.
+	public float lineMinDelta = 0.1f;
+	public float lineMaxDelta = 0.5f;
+	public float lineMaxLength = 8f;
+	public GameObject fireGroundSpellPrefab;
+
 	public bool _________________;
+
+	public Transform spellAnchor; //The parent transform for all spells.
+
+	public float totalLineLength;
 
 	public List<Vector3> linePts; //Poitns to be shown in the line.
 	protected LineRenderer liner; //Ref to the LineRenderer component.
@@ -95,6 +105,11 @@ public class Mage : PT_MonoBehaviour {
 		//Get the LineRenderer component and disable it.
 		liner = GetComponent<LineRenderer> ();
 		liner.enabled = false;
+
+		GameObject saGO = new GameObject ("Spell Anchor");
+		//^Create and empty GameObject named "Spell Anchor". when you create
+		//a new gameobject this way, it's at ...(pg 761)
+		spellAnchor = saGO.transform; //Get its transform.
 	}
 
 	void Update() {
@@ -271,11 +286,32 @@ public MouseInfo lastMouseInfo {
 			//Stop walking when the drag is stopped
 			StopWalking ();
 		} else {
-		//ToDO: Cast the spell!!!!
-
+			CastGroundSpell();
 			//Clear the liner
 			ClearLiner();
 		}
+	}
+
+	void CastGroundSpell() {
+	//There is not a no-element ground spell, so return
+		if (selectedElements.Count == 0)
+			return;
+
+		//Because this version of the prototype only allows a single
+		//element to be selected, we can use that 0th element to pick the spell.
+		switch (selectedElements [0].type) {
+		case ElementType.fire:
+			GameObject fireGO;
+			foreach(Vector3 pt in linePts) {
+				fireGO = Instantiate(fireGroundSpellPrefab) as GameObject;
+				fireGO.transform.parent = spellAnchor;
+				fireGO.transform.position = pt;
+			}
+			break;
+			// TO do: ADD OTHER ELEMENTS HERE!!!392034208457!!!!234392841!
+		}
+		//Clear the selectedElements; they're consued by the spell.
+		ClearElements ();
 	}
 
 	//Walk to a specific position. The position.z is always 0.
@@ -402,13 +438,53 @@ public MouseInfo lastMouseInfo {
 
 	//-----------------LineRenderer Code ---------------------------//
 
-	//Add a new point to the line.
+	//Add a new point to the line. This ignores the point if it's too close to
+	//existing ones and adds extra points if it's too far away.
 	void AddPointToLiner(Vector3 pt) {
 		pt.z = lineZ; //Set the z of the pt to lineZ to elevate it slightly
 		//above the ground.
+	
+		//linePts.Add (pt);
+		//UpdateLiner ();
 
-		linePts.Add (pt);
-		UpdateLiner ();
+		//Always add the point if linePts is empty...
+		if (linePts.Count == 0) {
+			linePts.Add (pt);
+			totalLineLength = 0;
+			return; //...but wait for a second point to enable the LineRenderer.
+		}
+
+		//If the line is too long already, return.
+		if (totalLineLength > lineMaxLength)
+			return;
+
+		//If there is a previous point (pt0) , then find how far pt is from it.
+		Vector3 pt0 = linePts[linePts.Count-1]; //Get the last point in linePts
+		Vector3 dir = pt - pt0;
+		float delta = dir.magnitude;
+		dir.Normalize ();
+
+		totalLineLength += delta;
+
+		//If it's less than the min distance
+		if (delta < lineMinDelta) {
+		//...Then it's too close, don't add it.
+			return;
+		}
+
+		//If it's further than the max distance then extra points...
+		if (delta > lineMaxDelta) {
+		//....Then add extra points in between.
+			float numToAdd = Mathf.Ceil (delta/lineMaxDelta);
+			float midDelta = delta/numToAdd;
+			Vector3 ptMid;
+			for(int i=1; i<numToAdd; i++) {
+				ptMid = pt0+(dir*midDelta*i);
+				linePts.Add (ptMid);
+			}
+		}
+		linePts.Add (pt); //Add the point.
+		UpdateLiner (); //Add finally update the line.
 	}
 
 	//Update the LineRenderer with the new points
