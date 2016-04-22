@@ -57,6 +57,11 @@ public class Mage : PT_MonoBehaviour {
 
 	public float speed = 2; //The speed at which _Mage walks.
 
+	public GameObject[] elementPrefabs; //The Element_Sphere prefabs
+	public float elementRotDist = 0.5f; //Radius of rotation
+	public float elementRotSpeed = 0.5f; //Period of rotation
+	public int maxNumSelectedElements = 1;
+
 	public bool _________________;
 
 
@@ -66,6 +71,8 @@ public class Mage : PT_MonoBehaviour {
 	public bool walking = false;
 	public Vector3 walkTarget;
 	public Transform characterTrans;
+
+	public List<Element> selectedElements = new List<Element>();
 
 
 	void Awake() {
@@ -121,6 +128,12 @@ public class Mage : PT_MonoBehaviour {
 			if(dragDist >= mDragDist) {
 					mPhase = MPhase.drag;
 			}
+
+				//However, drag will immediately start after mTrapTime if there
+				//are no elements selected.
+				if(selectedElements.Count == 0 ) {
+					mPhase = MPhase.drag;
+			}
 		}
 	}
 
@@ -136,6 +149,8 @@ public class Mage : PT_MonoBehaviour {
 		}
 
 	}
+
+		orbitSelectedElements ();
 }
 
 		//Pulls info about the Mouse, add it to mouseInfos, and returns it
@@ -260,5 +275,25 @@ public MouseInfo lastMouseInfo {
 		GameObject go = Instantiate (tapIndicatorPrefab)as GameObject;
 		go.transform.position = loc;
 	}
+
+	//Choose an element_sphere of elType and adds it to selectedElements.
+	public void SelectElement(ElementType elType) {
+	if (elType == ElementType.none) {		//If it's the none elemeent...
+			ClearElements();		//Then clear all elements...
+			return;					//and return.
+		}
+
+		if (maxNumSelectedElements == 1) {
+		//If only one gen can be selected, clear the existing one...
+			ClearElements(); //so it can be replaced.
+		}
+
+		//Can't select more than maxNumSelectedElements simultaneously
+		if (selectedElements.Count >= maxNumSelectedElements) return;
+
+	//It's okay to add this element.
+		GameObject go = Instantiate (elementPrefabs [(int)elType]) as GameObject;
+		//^ Note the typecast from ElementType to int in the line above.
+  }
 }
   
