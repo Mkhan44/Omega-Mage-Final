@@ -40,6 +40,7 @@ public class Mage : PT_MonoBehaviour {
 	static public bool DEBUG = true;
 
 	public float mTapTime = 0.1f; //How long is considered a tap.
+	public GameObject tapIndicatorPrefab; //Prefab of the tap indicator.
 	public float mDragDist = 5; //Min dist in pixels to be a drag.
 
 	public float activeScreenWidth = 1; //%of the screen to use.
@@ -172,6 +173,7 @@ public MouseInfo lastMouseInfo {
 	//Something was tapped like a button
 		if(DEBUG) print ("Mage.MouseTap()");
 		WalkTo(lastMouseInfo.loc); //Walk to the latest mouseInfo pos;
+		ShowTap (lastMouseInfo.loc); //Show where the player tapped.
 	}
 
 	void MouseDrag() {
@@ -235,6 +237,12 @@ public MouseInfo lastMouseInfo {
 				StopWalking ();
 			}
 		}
+	}
+
+	//Show where the player tapped.
+	public void ShowTap(Vector3 loc ) {
+		GameObject go = Instantiate (tapIndicatorPrefab)as GameObject;
+		go.transform.position = loc;
 	}
 }
   
