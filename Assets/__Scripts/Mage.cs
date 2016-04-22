@@ -10,6 +10,16 @@ public enum MPhase {
 	drag
 }
 
+//The ElementType enum 
+public enum ElementType {
+earth,
+	water,
+	air,
+	fire,
+	aether,
+	none
+}
+
 //MouseInfo stores information about hte mouse in each frame of interaction.
 [System.Serializable]
 
@@ -180,12 +190,18 @@ public MouseInfo lastMouseInfo {
 	//The mouse is being drug across something
 		if (DEBUG)
 			print ("Mage.MouseDrag()");
+
+		//Continuously walk toward the current mouseInfo pos
+		WalkTo (mouseInfos[mouseInfos.Count-1].loc);
 	}
 
 	void MouseDragUp() {
 	//The mouse is released after being drug
 		if (DEBUG)
 			print ("Mage.MouseDragUp()");
+
+		//Stop walking when the drag is stopped
+		StopWalking ();
 	}
 
 	//Walk to a specific position. The position.z is always 0.
