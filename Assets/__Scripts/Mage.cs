@@ -507,5 +507,10 @@ public MouseInfo lastMouseInfo {
 		liner.enabled = false; //Disable linerenderer
 		linePts.Clear (); //And clear all linePts.
 	}
+
+	//Stop any active drag or other mouse input.
+	public void ClearInput() {
+		mPhase = MPhase.idle;
+	}
 }
   
