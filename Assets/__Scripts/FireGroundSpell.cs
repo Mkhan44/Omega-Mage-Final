@@ -54,7 +54,7 @@ public class FireGroundSpell : PT_MonoBehaviour {
 		EnemyBug recipient = other.GetComponent<EnemyBug> ();
 		//If there is an EnemyBug component, damage it with fire.
 		if (recipient != null) {
-			recipient.Damage (damagePerSecond, true);
+			recipient.Damage (damagePerSecond, ElementType.fire, true);
 		}
 	}
 }
