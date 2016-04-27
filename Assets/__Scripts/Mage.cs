@@ -69,7 +69,21 @@ public class Mage : PT_MonoBehaviour {
 	public float lineMaxLength = 8f;
 	public GameObject fireGroundSpellPrefab;
 
+	public float health = 4; //Total mage health.
+	public float damageTime = -100;
+	//^Time that damage occured. it's set to -100 so that the Mage doesn't
+	//act dmged immediately when the scene starts.
+	public float knockbackDist = 1; //Distance to move backward.
+	public float knockbackDur = 0.5f; //Seconds to move backward.
+	public float invincibleDur = 0.5f; //Seconds to be invincible.
+	public int invTimeToBlink = 4; // # blinks while invincible.
+
 	public bool _________________;
+
+	private bool invincibleBool = false; //Is Mage invincible.
+	private bool knockbackBool = false; // Mage being knocked back.
+	private Vector3 knockbackDir; //Direction of knockback.
+	private Transform viewCharacterTrans;
 
 	public Transform spellAnchor; //The parent transform for all spells.
 
@@ -101,6 +115,7 @@ public class Mage : PT_MonoBehaviour {
 
 		//Find the charactetTrans to rotate with Face()
 		characterTrans = transform.Find ("CharacterTrans");
+		viewCharacterTrans = characterTrans.Find ("View_Character");
 
 		//Get the LineRenderer component and disable it.
 		liner = GetComponent<LineRenderer> ();
@@ -338,6 +353,30 @@ public MouseInfo lastMouseInfo {
 	}
 
 	void FixedUpdate () {
+		if (invincibleBool) {
+		//Get number [0..1]
+			float blinkU = (Time.time - damageTime)/invincibleDur;
+			blinkU *= invTimeToBlink; //Multiply by times to blink.
+			blinkU %= 1.0f;
+			//^Modulo 1.0 gives us the decimal remainder left when dividing blinkU
+			//By 1.0. For example: 3.85f % 1.0f is 0.85f
+			bool visible = (blinkU > 0.5f);
+			if(Time.time - damageTime > invincibleDur) {
+				invincibleBool = false;
+				visible = true; //Just to be sure.
+			}
+			//Making the GameObject inactive makes it invisble.
+			viewCharacterTrans.gameObject.SetActive(visible);
+		}
+
+		if (knockbackBool) {
+		if(Time.time - damageTime > knockbackDur) {
+				knockbackBool = false;
+			}
+			float knockbackSpeed = knockbackDist/knockbackDur;
+			vel = knockbackDir * knockbackSpeed;
+			return; //Returns to avoid walking code below.
+		}
 	if (walking) {
 			if ((walkTarget - pos).magnitude < speed * Time.fixedDeltaTime) {
 				//If mage is very close to walkTarget , just stop there.
@@ -363,6 +402,38 @@ public MouseInfo lastMouseInfo {
 				StopWalking ();
 			}
 		}
+		//See if it's an EnemyBug.
+		EnemyBug bug = coll.gameObject.GetComponent<EnemyBug> ();
+		//If otherGO is an EnemyBug, pass otherGO to CollisionDmg()
+		if (bug != null)
+			CollisionDamage (otherGO);
+	}
+
+	void CollisionDamage(GameObject enemy) {
+	//Don't take damage if you're already invincible.
+		if (invincibleBool)
+			return;
+
+		//The Mage has been hit by an enemy.
+		StopWalking ();
+		ClearInput ();
+
+		health -= 1; //Take 1 point of dmg (for now)
+		if (health <= 0) {
+			Die();
+			return;
+		}
+
+		damageTime = Time.time;
+		knockbackBool = true;
+		knockbackDir = (pos - enemy.transform.position).normalized;
+		invincibleBool = true;
+	}
+
+	//The Mage dies
+	void Die() {
+		Application.LoadLevel (0); //Reload the level.
+		// ^Eventually, you'll want ot do something more elegant.
 	}
 
 	//Show where the player tapped.
