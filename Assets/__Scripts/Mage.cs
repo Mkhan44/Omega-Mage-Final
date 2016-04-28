@@ -404,12 +404,23 @@ public MouseInfo lastMouseInfo {
 		}
 		//See if it's an EnemyBug.
 		EnemyBug bug = coll.gameObject.GetComponent<EnemyBug> ();
-		//If otherGO is an EnemyBug, pass otherGO to CollisionDmg()
+		//If otherGO is an EnemyBug, pass otherGO to CollisionDmg() which will
+		//interpret it as an Enemy.
 		if (bug != null)
-			CollisionDamage (otherGO);
+			CollisionDamage (bug);
+			//CollisionDamage (otherGO);
 	}
 
-	void CollisionDamage(GameObject enemy) {
+	void OnTriggerEnter(Collider other) {
+		EnemySpiker spiker = other.GetComponent<EnemySpiker> ();
+		if (spiker != null) {
+			//CollisionDamage() will see spiker as an Enemy.
+			CollisionDamage (spiker);
+			//CollisionDamage (spiker.gameObject);
+		}
+	}
+
+	void CollisionDamage(Enemy enemy) {
 	//Don't take damage if you're already invincible.
 		if (invincibleBool)
 			return;
@@ -418,7 +429,7 @@ public MouseInfo lastMouseInfo {
 		StopWalking ();
 		ClearInput ();
 
-		health -= 1; //Take 1 point of dmg (for now)
+		health -= enemy.touchDamage; //Take damage based on Enemy.
 		if (health <= 0) {
 			Die();
 			return;
@@ -426,7 +437,7 @@ public MouseInfo lastMouseInfo {
 
 		damageTime = Time.time;
 		knockbackBool = true;
-		knockbackDir = (pos - enemy.transform.position).normalized;
+		knockbackDir = (pos - enemy.pos).normalized;
 		invincibleBool = true;
 	}
 
