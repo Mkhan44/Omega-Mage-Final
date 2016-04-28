@@ -10,7 +10,10 @@ public class EnemySpiker : PT_MonoBehaviour , Enemy {
 		set { _touchDamage = value; }
 	}
 	//The pos Property is already implemented in PT_Monobehaviour.
-
+	public string typeString {
+		get { return(roomXMLString); }
+		set { roomXMLString = value; }
+	}
 	public float speed = 5f;
 	public string roomXMLString = "{";
 

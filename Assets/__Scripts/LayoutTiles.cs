@@ -9,6 +9,13 @@ public class TileTex {
 	public Texture2D tex;
 }
 
+[System.Serializable]
+public class EnemyDef {
+//This class enables us to define various enemies.
+	public string str;
+	public GameObject go;
+}
+
 public class LayoutTiles : MonoBehaviour {
 	static public LayoutTiles S;
 
@@ -18,6 +25,7 @@ public class LayoutTiles : MonoBehaviour {
 	public GameObject tilePrefab; //Prefab for all Tiles.
 	public TileTex[] tileTextures; //A list of named textures for Tiles.
 	public GameObject portalPrefab; //Prefab for the portals between rooms.
+	public EnemyDef[] enemyDefinitions; //Prefabs for enemies.
 
 	public bool _____________;
 
@@ -207,11 +215,23 @@ public class LayoutTiles : MonoBehaviour {
 					p.toRoom = rawType;
 					portals.Add (p);
 					break;
+			
+				default:
+					//Try to see if there's an Enemy for that letter.
+					Enemy en = EnemyFactory(rawType);
+					if(en == null) break; //If there's not one, break out
+					//Set up the new Enemy.
+					en.pos = ti.pos;
+					//Make en a child of tileAnchor so it's deleted when the
+					//Next room is loaded.
+					en.transform.parent = tileAnchor;
+					en.typeString = rawType;
+					break;
 				}
 
-				//More to come here...
 			}
 		}
+
 
 		//Position the mage
 		foreach(Portal p in portals) {
@@ -240,7 +260,31 @@ public class LayoutTiles : MonoBehaviour {
 			}
 		}
 
-		//Finall assign the room number.
+	
+		//Finally assign the room number.
 		roomNumber = rNumStr;
+	}
+
+	public Enemy EnemyFactory(string sType) {
+		//See if there's an EnemyDef with that sType.
+		GameObject tilePrefab = null;
+		foreach(EnemyDef ed in enemyDefinitions) {
+			if(ed.str == sType) {
+				tilePrefab = ed.go;
+				break;
+			}
+		}
+		if(tilePrefab == null) {
+			Utils.tr ("LayoutTiles.EnemyFactor()", "No EnemyDef for: "+sType);
+			return(null);
+		}
+		GameObject go = Instantiate(tilePrefab) as GameObject;
+		
+		//The generic form of GetComponent(with the <>) won't work
+		//interfaces like Enemy, so we must use this form instead.
+		Enemy en = (Enemy) go.GetComponent(typeof(Enemy));
+		
+		return(en);
+		
 	}
 }

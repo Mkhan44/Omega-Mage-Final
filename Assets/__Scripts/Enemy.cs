@@ -6,5 +6,10 @@ using System.Collections;
 		//Classes that implement the Enemy interface.
 		Vector3 pos { get; set; } //The Enemy's transform.position.
 		float touchDamage {get; set;} //Damage done by touching the enemy.
+	string typeString { get; set; } //The type string from Rooms.xml.
+
+	//The following are already implemented by all MonoBehaviour subclasses.
+	GameObject gameObject { get; }
+	Transform transform { get; }
 	}
 
