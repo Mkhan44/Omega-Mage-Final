@@ -443,7 +443,7 @@ public MouseInfo lastMouseInfo {
 
 	//The Mage dies
 	void Die() {
-		Application.LoadLevel (0); //Reload the level.
+		Application.LoadLevel ("_OmegaMageStart"); //Reload the level.
 		// ^Eventually, you'll want ot do something more elegant.
 	}
 
