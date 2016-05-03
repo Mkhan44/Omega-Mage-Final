@@ -119,7 +119,15 @@ public class EnemyBug : PT_MonoBehaviour , Enemy {
 			break;
 
 		case ElementType.air:
-			//air doesn't damage EnemyBugs, so do nothing
+			damageDict[eT] = Mathf.Max (amt,damageDict[eT]);
+			break;
+
+		case ElementType.earth: 
+			damageDict[eT] = Mathf.Max (amt,damageDict[eT]);
+			break;
+
+		case ElementType.water: 
+			speed = 0;
 			break;
 
 		default:
@@ -130,6 +138,7 @@ public class EnemyBug : PT_MonoBehaviour , Enemy {
 
 
 	}
+
 
 	//LateUpdate() is automatically called by Unity every frame. Once all the
 	//Updates() on all instances have been called, then LateUpdate() is called

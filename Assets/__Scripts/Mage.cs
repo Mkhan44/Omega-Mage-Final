@@ -68,6 +68,9 @@ public class Mage : PT_MonoBehaviour {
 	public float lineMaxDelta = 0.5f;
 	public float lineMaxLength = 8f;
 	public GameObject fireGroundSpellPrefab;
+	public GameObject earthGroundSpellPrefab;
+	public GameObject waterGroundSpellPrefab;
+	public GameObject airGroundSpellPrefab;
 
 	public float health = 4; //Total mage health.
 	public float damageTime = -100;
@@ -321,6 +324,31 @@ public MouseInfo lastMouseInfo {
 				fireGO = Instantiate(fireGroundSpellPrefab) as GameObject;
 				fireGO.transform.parent = spellAnchor;
 				fireGO.transform.position = pt;
+			}
+			break;
+
+		case ElementType.earth:
+			GameObject earthGO;
+			foreach(Vector3 pt in linePts) {
+				earthGO = Instantiate(earthGroundSpellPrefab) as GameObject;
+				earthGO.transform.parent = spellAnchor;
+				earthGO.transform.position = pt;
+			}
+			break;
+		case ElementType.water:
+			GameObject waterGO;
+			foreach(Vector3 pt in linePts) {
+				waterGO = Instantiate(waterGroundSpellPrefab) as GameObject;
+				waterGO.transform.parent = spellAnchor;
+				waterGO.transform.position = pt;
+			}
+			break;
+		case ElementType.air:
+			GameObject airGO;
+			foreach(Vector3 pt in linePts) {
+				airGO = Instantiate(airGroundSpellPrefab) as GameObject;
+				airGO.transform.parent = spellAnchor;
+				airGO.transform.position = pt;
 			}
 			break;
 			// TO do: ADD OTHER ELEMENTS HERE!!!392034208457!!!!234392841!
