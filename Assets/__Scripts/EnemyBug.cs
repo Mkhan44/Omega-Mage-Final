@@ -127,7 +127,6 @@ public class EnemyBug : PT_MonoBehaviour , Enemy {
 			break;
 
 		case ElementType.water: 
-			speed = 0;
 			break;
 
 		default:
@@ -136,8 +135,8 @@ public class EnemyBug : PT_MonoBehaviour , Enemy {
 			break;
 		}
 
-
 	}
+
 
 
 	//LateUpdate() is automatically called by Unity every frame. Once all the

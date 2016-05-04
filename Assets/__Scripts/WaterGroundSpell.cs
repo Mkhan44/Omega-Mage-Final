@@ -12,6 +12,7 @@ public class WaterGroundSpell : PT_MonoBehaviour {
 	public float damagePerSecond = 0;
 
 
+
 	void Start() {
 		timeStart = Time.time;
 		duration = Random.Range (duration - durationVariance, duration + durationVariance);
@@ -36,7 +37,7 @@ public class WaterGroundSpell : PT_MonoBehaviour {
 
 		if (u > 1) {
 			Destroy(gameObject); //...Destroy it.
-		}
+			}
 	}
 
 	void OnTriggerEnter(Collider other) {
@@ -46,15 +47,30 @@ public class WaterGroundSpell : PT_MonoBehaviour {
 			go = other.gameObject;
 		}
 		Utils.tr ("Water hit", go.name);
+
 	}
 
 	void OnTriggerStay(Collider other) {
-	//Actually damage the other
-		//Get a reference to the EnemyBug script component of the other
 		EnemyBug recipient = other.GetComponent<EnemyBug> ();
-		//If there is an EnemyBug component, damage it with fire.
 		if (recipient != null) {
-			recipient.Damage (damagePerSecond, ElementType.water, true);
+			recipient.speed = 0.0f;
+		}
+		EnemySpiker recipient2 = other.GetComponent<EnemySpiker> ();
+		if (recipient2 != null) {
+			recipient2.speed = 0.0f;
 		}
 	}
+
+	void OnTriggerExit(Collider other) {
+		//When enemy exits this field or the instance dissapears, movement speed goes back to normal.
+		//Get a reference to the EnemyBug script component of the other
+		EnemyBug recipient = other.GetComponent<EnemyBug> ();
+			if (recipient != null) {
+			recipient.speed = 0.5f;
+		}
+		EnemySpiker recipient2 = other.GetComponent<EnemySpiker> ();
+		if (recipient2 != null) {
+			recipient2.speed = 5f;
+		}
+	  }
 }
