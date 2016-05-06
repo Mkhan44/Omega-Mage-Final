@@ -11,7 +11,6 @@ public class EarthGroundSpell : PT_MonoBehaviour {
 	public float timeStart; //Birth time of this GameObject.
 	public float damagePerSecond = 0;
 
-
 	void Start() {
 		timeStart = Time.time;
 		duration = Random.Range (duration - durationVariance, duration + durationVariance);
@@ -52,15 +51,20 @@ public class EarthGroundSpell : PT_MonoBehaviour {
 	//Actually damage the other
 		//Get a reference to the EnemyBug script component of the other
 		EnemyBug recipient = other.GetComponent<EnemyBug> ();
+
+
+
 		//If there is an EnemyBug component, heal it.
 		if (recipient != null) {
 			recipient.health += 0.01f;
 		}
 		Mage recipient2 = other.GetComponent<Mage> ();
+		
 		if (recipient2 != null) {
 				if(recipient2.health <= 4f)
 			{
 			recipient2.health += 1f;
+
 				if(recipient2.health >= 4f)
 					recipient2.health = 4f;
 			}

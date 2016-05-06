@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 using System.Collections.Generic; //Enables List<>s
 using System.Linq; //Enables LINQ queries
 
@@ -73,6 +74,7 @@ public class Mage : PT_MonoBehaviour {
 	public GameObject airGroundSpellPrefab;
 
 	public float health = 4; //Total mage health.
+	public Text HPText;
 	public float damageTime = -100;
 	//^Time that damage occured. it's set to -100 so that the Mage doesn't
 	//act dmged immediately when the scene starts.
@@ -128,6 +130,7 @@ public class Mage : PT_MonoBehaviour {
 		//^Create and empty GameObject named "Spell Anchor". when you create
 		//a new gameobject this way, it's at ...(pg 761)
 		spellAnchor = saGO.transform; //Get its transform.
+		SetHPText ();
 	}
 
 	void Update() {
@@ -198,6 +201,9 @@ public class Mage : PT_MonoBehaviour {
 
 	}
 		OrbitSelectedElements ();
+		if (health >= health) {
+			SetHPText ();
+		}
 	
 }
 
@@ -458,6 +464,7 @@ public MouseInfo lastMouseInfo {
 		ClearInput ();
 
 		health -= enemy.touchDamage; //Take damage based on Enemy.
+		SetHPText ();
 		if (health <= 0) {
 			Die();
 			return;
@@ -621,6 +628,11 @@ public MouseInfo lastMouseInfo {
 	//Stop any active drag or other mouse input.
 	public void ClearInput() {
 		mPhase = MPhase.idle;
+	}
+
+	void SetHPText()
+	{
+		HPText.text = "Current Health: " + health.ToString () + "/4";
 	}
 }
   

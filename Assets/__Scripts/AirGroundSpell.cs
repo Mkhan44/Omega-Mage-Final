@@ -4,12 +4,12 @@ using System.Collections;
 //Extends PT_MonoBehaviour
 public class AirGroundSpell : PT_MonoBehaviour {
 
-	public float duration = 10; //Lifetime of the GameObject.
-	public float durationVariance = 0.0f;
+	public float duration = 6; //Lifetime of the GameObject.
+	public float durationVariance = 0.5f;
 	// ^ This allows the duration to range from 3.5 to 4.5
 	public float fadeTime = 1f; //Length of time to fade.
 	public float timeStart; //Birth time of this GameObject.
-	public float damagePerSecond = 1.5f;
+	public float damagePerSecond = 2.5f;
 
 
 	void Start() {
