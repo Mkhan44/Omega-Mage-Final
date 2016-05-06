@@ -1,8 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\__Scripts\Tile.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\__Scripts\MainMenu.cs">
     <Files>
-      <File FileName="Assets\__Scripts\Tile.cs" Line="48" Column="1" />
+      <File FileName="Assets\__Scripts\Mage.cs" Line="204" Column="1" />
+      <File FileName="Assets\__Scripts\EarthGroundSpell.cs" Line="13" Column="2" />
+      <File FileName="Assets\__Scripts\AirGroundSpell.cs" Line="12" Column="34" />
+      <File FileName="Assets\__Scripts\MainMenu.cs" Line="14" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

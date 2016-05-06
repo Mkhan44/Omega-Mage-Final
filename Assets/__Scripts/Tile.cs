@@ -25,7 +25,7 @@ public class Tile : MonoBehaviour {
 
 	//Sets the texture of the Tile based on a String.
 	//It requires LayoutTiles, so it's commented out for now.
-	/*
+
 	  public string tex {
 		get {
 		return(_tex);
@@ -41,12 +41,13 @@ public class Tile : MonoBehaviour {
 			}
 	}
   }
-  */
+  
 
 	//Uses the "new" keyword to replace the pos inherited from PT_MonoBehaviour
 	//Without the "new" keyword, the two properties would conflict.
 	new public Vector3 pos {
-		get{ return(_pos); }
+		get{ 
+			return(_pos); }
 		set {
 			_pos = value;
 			AdjustHeight();
